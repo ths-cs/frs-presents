@@ -10,11 +10,11 @@
             --primary-hover: #4338ca;
             --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --text-dark: #1f2937;
-            --card-bg: rgba(255, 255, 255, 0.98);
+            --card-bg: #ffffff;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: var(--bg-gradient);
             display: flex;
             justify-content: center;
@@ -22,14 +22,13 @@
             min-height: 100vh;
             margin: 0;
             padding: 20px;
-            color: var(--text-dark);
         }
 
         .card {
             background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            padding: 2.5rem;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
             text-align: center;
             max-width: 550px;
             width: 100%;
@@ -37,49 +36,63 @@
 
         h1 {
             margin-top: 0;
-            font-size: 1.6rem;
             color: var(--primary);
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 1rem;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .input-group {
-            margin: 1.5rem 0;
+            margin-bottom: 1.5rem;
             display: flex;
-            gap: 10px;
+            gap: 12px;
             justify-content: center;
             align-items: center;
-            flex-wrap: wrap;
         }
+
+        label { font-weight: 600; color: var(--text-dark); }
 
         input[type="number"] {
             padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            width: 70px;
-            font-size: 1.1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            width: 85px;
+            font-size: 1.2rem;
             text-align: center;
-            outline: none;
+            transition: border-color 0.2s;
         }
 
         input[type="number"]:focus {
             border-color: var(--primary);
+            outline: none;
         }
 
-        #prompt-display {
+        #prompt-area {
             background: #f8fafc;
-            border-left: 5px solid var(--primary);
+            border: 2px solid #f1f5f9;
             padding: 2rem;
-            font-size: 1.4rem;
             margin: 1.5rem 0;
             min-height: 120px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 500;
-            border-radius: 8px;
+            border-radius: 16px;
+        }
+
+        #prompt-display {
+            font-size: 1.4rem;
             line-height: 1.5;
-            color: #334155;
+            color: var(--text-dark);
+            font-weight: 500;
+            opacity: 1;
+            transition: opacity 0.3s ease; /* THE ANIMATION */
         }
 
         button {
@@ -87,41 +100,40 @@
             color: white;
             border: none;
             padding: 14px 28px;
-            border-radius: 10px;
+            border-radius: 12px;
             cursor: pointer;
             font-size: 1rem;
             font-weight: 600;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         button:hover {
             background: var(--primary-hover);
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
         }
 
-        .secondary-btn {
+        .surprise-btn {
             background: #0ea5e9;
             margin-top: 10px;
+            width: 100%;
         }
 
-        .secondary-btn:hover {
-            background: #0284c7;
-        }
+        .surprise-btn:hover { background: #0284c7; }
 
-        .poise-reminder {
+        .reminder {
             font-size: 0.9rem;
             color: #64748b;
-            margin-top: 2rem;
-            padding-top: 1rem;
-            border-top: 1px solid #f0f0f0;
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #f1f5f9;
         }
 
-        .poise-reminder span {
-            display: block;
-            margin-top: 5px;
-            font-weight: bold;
+        .poise-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+            font-weight: 600;
             color: #475569;
         }
     </style>
@@ -129,26 +141,33 @@
 <body>
 
 <div class="card">
-    <h1>🎤 Fishbowl Speech Generator</h1>
+    <h1>🎤 Fishbowl Prompt</h1>
+    <div class="subtitle">Impromptu Speech Tool</div>
     
     <div class="input-group">
-        <label for="box-num">Draw from Box (1-29):</label>
-        <input type="number" id="box-num" min="1" max="29" placeholder="#">
-        <button onclick="getBoxPrompt()">Draw</button>
+        <label for="seat-num">Seat #:</label>
+        <input type="number" id="seat-num" min="1" max="29" placeholder="1-29">
+        <button onclick="animatePrompt('seat')">Get Topic</button>
     </div>
 
-    <div id="prompt-display">Enter your box number to see your topic!</div>
+    <div id="prompt-area">
+        <div id="prompt-display">Enter your seat number to begin!</div>
+    </div>
     
-    <button class="secondary-btn" onclick="generateRandomPrompt()">✨ Total Random Surprise</button>
+    <button class="surprise-btn" onclick="animatePrompt('random')">✨ Random Surprise</button>
 
-    <div class="poise-reminder">
-        <strong>Presentation Goals:</strong>
-        <span>1. Agree or Disagree • 2. Provide 2-3 Examples • 3. Maintain Eye Contact</span>
+    <div class="reminder">
+        <strong>Poise Reminders:</strong>
+        <div class="poise-grid">
+            <span>✓ Agree/Disagree</span>
+            <span>✓ 2-3 Examples</span>
+            <span>✓ Eye Contact</span>
+            <span>✓ No Fillers (um/like)</span>
+        </div>
     </div>
 </div>
 
 <script>
-    // Data from Student Handout 2.8.1 and new expansion boxes
     const fishbowlData = {
         1: ["Money should be replaced with a barter system.", "Having siblings is a good thing.", "Monday should be the third day of a 3-day weekend."],
         2: ["Cool teachers are easier to learn from.", "The driving age should be 18.", "All high schools should have a school uniform."],
@@ -167,47 +186,44 @@
         15: ["Tattoos should be illegal for teens.", "Teens that commit serious crimes should be charged as adults.", "Nice handwriting is a worthless skill."],
         16: ["Parents should never give teens too much money.", "Teens should spend more time with the elderly.", "Bullying changes a teen forever."],
         17: ["More time should be spent reading.", "Ads marketed to teens are too 'grown up'.", "Part-time jobs should be legal at 14."],
-        18: ["Teens should not get involved in online relationships.", "Piercing your tongue is disgusting.", "More time should be spent in nature."],
+        18: ["Teens should not get involved in online relationships.", "Piercing your tongue is disgusting.", "Social media does more harm than good."],
         19: ["No teen should be labeled a lost cause.", "The media is responsible for society's moral decline.", "Boys get more acne than girls."],
-        20: ["Respond to your enemies with kindness.", "There is no such thing as a bff.", "Community service is an effective consequence for teens in legal trouble."],
+        20: ["Respond to your enemies with kindness.", "There is no such thing as a bff.", "Community service is a good legal consequence."],
         21: ["Quiet time for teens is a necessity.", "Everyone should keep a journal.", "There is no getting out of the Friendship Zone."],
         22: ["It is possible to have too many friends.", "Funny guys get more dates than handsome guys.", "Wearing glasses makes you look smarter."],
         23: ["Parents have the right to always have access to their teen's phone.", "Teens should have their own savings account.", "Fame is bad for young people."],
-        24: ["Parents have the right to set their teen's dress code.", "Face tats are always regretted at some point.", "Prom is overrated."],
+        24: ["Parents have the right to set their teen's dress code.", "Face tats are always regretted.", "Prom is overrated."],
         25: ["Schools should do more to prepare teens for puberty.", "Teens lead very stressful lives.", "Teens need adults to trust them."],
-        26: ["Teens shouldn't be allowed to be millionaires.", "Teens often try too hard to copy others' looks.", "High schools shouldn't be allowed to start before 9am.", "Teens crave responsibility."],
-        27: ["Summer break should be shorter but have more frequent breaks.", "Group projects are a fair way to grade students.", "Social media 'likes' should be hidden for everyone."],
-        28: ["Standardized testing is an outdated way to measure intelligence.", "Every student should be required to learn a second language.", "Video games are more educational than movies."],
-        29: ["Teens should have a say in their school’s budget.", "It is better to have one close friend than ten casual friends.", "AI will make school easier, not harder."]
+        26: ["Teens shouldn't be allowed to be millionaires.", "Teens try too hard to copy others' looks.", "High schools shouldn't start before 9am.", "Teens crave responsibility."],
+        27: ["Summer break should be shorter with more breaks.", "Group projects are a fair way to grade.", "Social media 'likes' should be hidden."],
+        28: ["Standardized testing is outdated.", "Every student should learn a second language.", "Video games are more educational than movies."],
+        29: ["Teens should have a say in school budgets.", "One close friend is better than ten casual ones.", "AI will make school easier, not harder."]
     };
 
-    function getBoxPrompt() {
-        const boxNum = document.getElementById('box-num').value;
+    function animatePrompt(type) {
         const display = document.getElementById('prompt-display');
-        
-        if (fishbowlData[boxNum]) {
-            const choices = fishbowlData[boxNum];
-            const randomChoice = choices[Math.floor(Math.random() * choices.length)];
-            display.style.opacity = 0;
-            setTimeout(() => {
-                display.innerText = `Box ${boxNum}: "${randomChoice}"`;
-                display.style.opacity = 1;
-            }, 200);
-        } else {
-            alert("Please enter a box number between 1 and 29.");
-        }
-    }
+        const seatNum = document.getElementById('seat-num').value;
 
-    function generateRandomPrompt() {
-        const allPrompts = Object.values(fishbowlData).flat();
-        const randomPrompt = allPrompts[Math.floor(Math.random() * allPrompts.length)];
-        const display = document.getElementById('prompt-display');
-        
+        // Validation for seat number
+        if (type === 'seat' && !fishbowlData[seatNum]) {
+            alert("Please enter a seat number between 1 and 29.");
+            return;
+        }
+
+        // Start Fade Out
         display.style.opacity = 0;
+
         setTimeout(() => {
-            display.innerText = `"${randomPrompt}"`;
+            if (type === 'seat') {
+                const choices = fishbowlData[seatNum];
+                display.innerText = choices[Math.floor(Math.random() * choices.length)];
+            } else {
+                const allPrompts = Object.values(fishbowlData).flat();
+                display.innerText = allPrompts[Math.floor(Math.random() * allPrompts.length)];
+            }
+            // Fade In
             display.style.opacity = 1;
-        }, 200);
+        }, 300);
     }
 </script>
 
