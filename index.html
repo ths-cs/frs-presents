@@ -1,74 +1,65 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Fishbowl Speech Generator</title>
-    <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5; margin: 0; }
-        .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; max-width: 500px; width: 90%; }
-        h1 { color: #1a73e8; font-size: 1.5rem; }
-        #prompt-display { font-size: 1.25rem; margin: 2rem 0; min-height: 80px; color: #333; font-weight: bold; }
-        button { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1rem; transition: background 0.2s; }
-        button:hover { background: #1557b0; }
-    </style>
-</head>
-<body>
-
 <div class="card">
     <h1>Fishbowl Speech Topic</h1>
-    <div id="prompt-display">Click the button to draw a prompt!</div>
-    <button onclick="generatePrompt()">Draw Random Topic</button>
+    
+    <label for="box-select">Choose your Box (1-29):</label>
+    <input type="number" id="box-num" min="1" max="29" placeholder="#">
+    <button onclick="getBoxPrompt()">Draw from Box</button>
+    
+    <hr>
+    
+    <div id="prompt-display">Enter a box number or click below!</div>
+    
+    <button onclick="generateRandomPrompt()">Surprise Me! (Total Random)</button>
 </div>
 
 <script>
-    const prompts = [
-        "Money should be replaced with a barter system.", "Having siblings is a good thing.", 
-        "Monday should be the third day of a 3-day weekend.", "Cool teachers are easier to learn from.",
-        "The driving age should be 18.", "All high schools should have a school uniform.",
-        "Teens should get free therapy after a breakup.", "Zombies are real.", 
-        "Being lazy is a true art.", "Having a Pen Pal is cool.", 
-        "Peer pressure can be a positive thing.", "Teens should spend more time in nature.",
-        "Students should be allowed to choose what they learn about in school.",
-        "There is plenty of truth to horoscopes.", "FOMO is a real fear.",
-        "It is important to date someone with similar beliefs.", "Facebook is for old people.",
-        "Celebrities have too much influence on teens.", "It should be easier to get a driver's license.",
-        "Junk food isn't all that bad.", "Homework does more harm than good.",
-        "It should be illegal for teens to drop out of school.", "Parents are embarrassing.",
-        "Every teen should learn to cook.", "'Staying in' is the new 'sneaking out.'",
-        "Pets are far better to talk to than parents.", "Eating should always be allowed in classes.",
-        "Teens should be rewarded for doing the right thing.", "Teens need cell phones.",
-        "Risk is a natural temptation for teens.", "Teen suicide is not given enough attention.",
-        "Teens should be banned from beauty surgery.", "More free time means more time to get into trouble.",
-        "Parents have no right to embarrass their teens.", "Teens should avoid dating too young.",
-        "Driving tests should be free.", "Teens do care what their parents think.",
-        "Cyberbullies should be dealt with more severely.", "Teen boys and girls should be taught in separate classes.",
-        "It is important that teens become volunteers.", "Beauty contests are harmful.",
-        "Middle school students should be banned from social media.", "Tattoos should be illegal for teens.",
-        "Teens that commit serious crimes should be charged as adults.", "Nice handwriting is a worthless skill.",
-        "Parents should never give teens too much money.", "Teens should spend more time with the elderly.",
-        "Bullying changes a teen forever.", "More time should be spent reading.",
-        "Ads marketed to teens are too 'grown up'.", "Part-time jobs should be legal at 14.",
-        "Teens should not get involved in online relationships.", "Piercing your tongue is disgusting.",
-        "No teen should be labeled a lost cause.", "The media is responsible for society's moral decline.",
-        "Boys get more acne than girls.", "Respond to your enemies with kindness.",
-        "There is no such thing as a bff.", "Community service is an effective consequence for teens in legal trouble.",
-        "Quiet time for teens is a necessity.", "Everyone should keep a journal.",
-        "There is no getting out of the Friendship Zone.", "It is possible to have too many friends.",
-        "Funny guys get more dates than handsome guys.", "Wearing glasses makes you look smarter.",
-        "Parents have the right to always have access to their teen's phone.", "Teens should have their own savings account.",
-        "Fame is bad for young people.", "Parents have the right to set their teen's dress code.",
-        "Face tats are always regretted at some point.", "Prom is overrated.",
-        "Schools should do more to prepare teens for puberty.", "Teens lead very stressful lives.",
-        "Teens need adults to trust them.", "Teens shouldn't be allowed to be millionaires.",
-        "Teens often try too hard to copy others' looks.", "High schools shouldn't be allowed to start before 9am.",
-        "Teens crave responsibility."
-    ];
+    // Organized by Box Number (1-26 from handout, 27-29 new)
+    const fishbowlData = {
+        1: ["Money should be replaced with a barter system.", "Having siblings is a good thing.", "Monday should be the third day of a 3-day weekend."],
+        2: ["Cool teachers are easier to learn from.", "The driving age should be 18.", "All high schools should have a school uniform."],
+        3: ["Teens should get free therapy after a breakup.", "Zombies are real.", "Being lazy is a true art."],
+        4: ["Having a Pen Pal is cool.", "Peer pressure can be a positive thing.", "Teens should spend more time in nature."],
+        5: ["Students should be allowed to choose what they learn about in school.", "There is plenty of truth to horoscopes.", "FOMO is a real fear."],
+        6: ["It is important to date someone with similar beliefs.", "Facebook is for old people.", "Celebrities have too much influence on teens."],
+        7: ["It should be easier to get a driver's license.", "Junk food isn't all that bad.", "Homework does more harm than good."],
+        8: ["It should be illegal for teens to drop out of school.", "Parents are embarrassing.", "Every teen should learn to cook."],
+        9: ["'Staying in' is the new 'sneaking out.'", "Pets are far better to talk to than parents.", "Eating should always be allowed in classes."],
+        10: ["Teens should be rewarded for doing the right thing.", "Teens need cell phones.", "Risk is a natural temptation for teens."],
+        11: ["Teen suicide is not given enough attention.", "Teens should be banned from beauty surgery.", "More free time means more time to get into trouble."],
+        12: ["Parents have no right to embarrass their teens.", "Teens should avoid dating too young.", "Driving tests should be free."],
+        13: ["Teens do care what their parents think.", "Cyberbullies should be dealt with more severely.", "Teen boys and girls should be taught in separate classes."],
+        14: ["It is important that teens become volunteers.", "Beauty contests are harmful.", "Middle school students should be banned from social media."],
+        15: ["Tattoos should be illegal for teens.", "Teens that commit serious crimes should be charged as adults.", "Nice handwriting is a worthless skill."],
+        16: ["Parents should never give teens too much money.", "Teens should spend more time with the elderly.", "Bullying changes a teen forever."],
+        17: ["More time should be spent reading.", "Ads marketed to teens are too 'grown up'.", "Part-time jobs should be legal at 14."],
+        18: ["Teens should not get involved in online relationships.", "Piercing your tongue is disgusting.", "More time should be spent in nature."],
+        19: ["No teen should be labeled a lost cause.", "The media is responsible for society's moral decline.", "Boys get more acne than girls."],
+        20: ["Respond to your enemies with kindness.", "There is no such thing as a bff.", "Community service is an effective consequence for teens in legal trouble."],
+        21: ["Quiet time for teens is a necessity.", "Everyone should keep a journal.", "There is no getting out of the Friendship Zone."],
+        22: ["It is possible to have too many friends.", "Funny guys get more dates than handsome guys.", "Wearing glasses makes you look smarter."],
+        23: ["Parents have the right to always have access to their teen's phone.", "Teens should have their own savings account.", "Fame is bad for young people."],
+        24: ["Parents have the right to set their teen's dress code.", "Face tats are always regretted at some point.", "Prom is overrated."],
+        25: ["Schools should do more to prepare teens for puberty.", "Teens lead very stressful lives.", "Teens need adults to trust them."],
+        26: ["Teens shouldn't be allowed to be millionaires.", "Teens often try too hard to copy others' looks.", "High schools shouldn't be allowed to start before 9am."],
+        27: ["Summer break should be shorter but have more frequent breaks.", "Group projects are a fair way to grade students.", "Social media 'likes' should be hidden for everyone."],
+        28: ["Standardized testing is an outdated way to measure intelligence.", "Every student should be required to learn a second language.", "Video games are more educational than movies."],
+        29: ["Teens should have a say in their school’s budget.", "It is better to have one close friend than ten casual friends.", "AI will make school easier, not harder."]
+    };
 
-    function generatePrompt() {
-        const randomIndex = Math.floor(Math.random() * prompts.length);
-        document.getElementById('prompt-display').innerText = prompts[randomIndex];
+    function getBoxPrompt() {
+        const boxNum = document.getElementById('box-num').value;
+        if (fishbowlData[boxNum]) {
+            const choices = fishbowlData[boxNum];
+            const randomChoice = choices[Math.floor(Math.random() * choices.length)];
+            document.getElementById('prompt-display').innerText = `Box ${boxNum}: ${randomChoice}`;
+        } else {
+            alert("Please enter a box number between 1 and 29.");
+        }
+    }
+
+    function generateRandomPrompt() {
+        const allPrompts = Object.values(fishbowlData).flat();
+        const randomPrompt = allPrompts[Math.floor(Math.random() * allPrompts.length)];
+        document.getElementById('prompt-display').innerText = randomPrompt;
     }
 </script>
-
-</body>
-</html>
