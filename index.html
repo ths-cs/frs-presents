@@ -26,25 +26,25 @@
 
         .card {
             background: var(--card-bg);
-            padding: 2.5rem;
+            padding: 2rem;
             border-radius: 24px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.25);
             text-align: center;
-            max-width: 550px;
+            max-width: 600px;
             width: 100%;
         }
 
         h1 {
             margin-top: 0;
             color: var(--primary);
-            font-size: 2rem;
+            font-size: 1.8rem;
             margin-bottom: 0.5rem;
         }
 
         .subtitle {
             color: #64748b;
-            font-size: 0.9rem;
-            margin-bottom: 2rem;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -77,22 +77,43 @@
         #prompt-area {
             background: #f8fafc;
             border: 2px solid #f1f5f9;
-            padding: 2rem;
+            padding: 1.5rem;
             margin: 1.5rem 0;
-            min-height: 120px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            min-height: 150px;
             border-radius: 16px;
+            text-align: left;
         }
 
-        #prompt-display {
-            font-size: 1.4rem;
-            line-height: 1.5;
+        .prompt-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .prompt-item {
+            background: white;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+            font-size: 1.1rem;
+            line-height: 1.4;
             color: var(--text-dark);
-            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             opacity: 1;
-            transition: opacity 0.3s ease; /* THE ANIMATION */
+            transition: opacity 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .prompt-item:last-child { margin-bottom: 0; }
+
+        .empty-state {
+            text-align: center;
+            color: #94a3b8;
+            font-style: italic;
+            padding-top: 2rem;
         }
 
         button {
@@ -114,25 +135,24 @@
 
         .surprise-btn {
             background: #0ea5e9;
-            margin-top: 10px;
             width: 100%;
         }
 
         .surprise-btn:hover { background: #0284c7; }
 
         .reminder {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #64748b;
-            margin-top: 2.5rem;
-            padding-top: 1.5rem;
+            margin-top: 2rem;
+            padding-top: 1rem;
             border-top: 1px solid #f1f5f9;
         }
 
         .poise-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 8px;
+            margin-top: 8px;
             font-weight: 600;
             color: #475569;
         }
@@ -141,20 +161,22 @@
 <body>
 
 <div class="card">
-    <h1>🎤 Fishbowl Prompt</h1>
+    <h1>🎤 Fishbowl Prompts</h1>
     <div class="subtitle">Impromptu Speech Tool</div>
     
     <div class="input-group">
         <label for="seat-num">Seat #:</label>
         <input type="number" id="seat-num" min="1" max="29" placeholder="1-29">
-        <button onclick="animatePrompt('seat')">Get Topic</button>
+        <button onclick="animatePrompts('seat')">View Topics</button>
     </div>
 
     <div id="prompt-area">
-        <div id="prompt-display">Enter your seat number to begin!</div>
+        <div id="prompt-content">
+            <div class="empty-state">Enter seat number to see all 3 topics</div>
+        </div>
     </div>
     
-    <button class="surprise-btn" onclick="animatePrompt('random')">✨ Random Surprise</button>
+    <button class="surprise-btn" onclick="animatePrompts('random')">✨ Single Random Surprise</button>
 
     <div class="reminder">
         <strong>Poise Reminders:</strong>
@@ -200,30 +222,39 @@
         29: ["Teens should have a say in school budgets.", "One close friend is better than ten casual ones.", "AI will make school easier, not harder."]
     };
 
-    function animatePrompt(type) {
-        const display = document.getElementById('prompt-display');
+    function animatePrompts(type) {
+        const displayArea = document.getElementById('prompt-content');
         const seatNum = document.getElementById('seat-num').value;
 
-        // Validation for seat number
         if (type === 'seat' && !fishbowlData[seatNum]) {
-            alert("Please enter a seat number between 1 and 29.");
+            displayArea.innerHTML = '<div class="empty-state" style="color:#ef4444">Invalid seat number. Try 1-29.</div>';
             return;
         }
 
-        // Start Fade Out
-        display.style.opacity = 0;
+        displayArea.style.opacity = 0;
 
         setTimeout(() => {
+            let html = '<ul class="prompt-list">';
+            
             if (type === 'seat') {
                 const choices = fishbowlData[seatNum];
-                display.innerText = choices[Math.floor(Math.random() * choices.length)];
+                choices.forEach((text, index) => {
+                    html += `<li class="prompt-item">
+                                <span><strong>${index + 1}.</strong> ${text}</span>
+                             </li>`;
+                });
             } else {
                 const allPrompts = Object.values(fishbowlData).flat();
-                display.innerText = allPrompts[Math.floor(Math.random() * allPrompts.length)];
+                const randomPrompt = allPrompts[Math.floor(Math.random() * allPrompts.length)];
+                html += `<li class="prompt-item" style="border-left-color: #0ea5e9">
+                            <span>✨ ${randomPrompt}</span>
+                         </li>`;
             }
-            // Fade In
-            display.style.opacity = 1;
-        }, 300);
+
+            html += '</ul>';
+            displayArea.innerHTML = html;
+            displayArea.style.opacity = 1;
+        }, 250);
     }
 </script>
 
